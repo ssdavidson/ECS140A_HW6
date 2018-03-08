@@ -16,3 +16,11 @@ np_camping_hiking_1or(N) :- np(N, _, A), A = [camping, hiking] ; np(N, _, B), B 
 np_camping_hiking_2wo(N) :- np(N, _, A), A = [camping, hiking].
 np_camping_hiking_2wo(N) :- np(N, _, A), A = [hiking, camping].
 np_camping_hiking_sort(N) :- np(N,_, A), sort(A, Z), Z = [camping, hiking].
+
+
+
+insert(L,E,Z) :- append(L, [E], X), sort(X,Z).
+butlast(L,Z) :- last(L,X), select(X, L, Z).
+naaa([], [] , []).
+naaa([H|T], NAL, AL) :- atom(H), naaa(T, NAL, AL1), append([H], AL1, AL).
+naaa([H|T], NAL, AL) :- integer(H), naaa(T, NAL1, AL), append([H], NAL1, NAL).
