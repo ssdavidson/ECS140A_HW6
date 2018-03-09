@@ -26,9 +26,9 @@ naaa([H|T], NAL, AL) :- atom(H), naaa(T, NAL, AL1), append([H], AL1, AL).
 naaa([H|T], NAL, AL) :- integer(H), naaa(T, NAL1, AL), append([H], NAL1, NAL).
 
 
+
 splitlist([P|T], [], P, T).
 splitlist([H|T], [H|T2], P, R) :- H \= P, splitlist(T, T2, P, R).
-
 split3list([P|T], C, [], P, T) :- member(C, P).
 split3list([H|T], C, [H|T2], P, R) :- last(H, LastObj), LastObj \= C, split3list(T, C, T2, P, R).
 
@@ -37,9 +37,6 @@ split3list([H|T], C, [H|T2], P, R) :- last(H, LastObj), LastObj \= C, split3list
 perm([ ],[ ]) :- !.
 perm(L,[H|T]) :- select(H,L,Z), perm(Z,T).
 permsub(L, Z) :- naaa(L, NAL, _), perm(L, Z), naaa(Z, NAL, _).
-
-getFirst([H|T], Z) :- Z = H.
-getSecond([H|T], Z) :- getFirst(T, Z).
 
 fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
   member(z, H),
