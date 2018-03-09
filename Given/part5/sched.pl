@@ -70,43 +70,43 @@ fit1stRequest(Entry, [H|T], [H|T2]) :-
 
 
 fitRelease(Owner, List, NewMemList) :-
-  split3list(List, Owner, Left, [PivotAddr|[PvtSz|PvtOwner]], [H|T]),
-  last(T, RightOwner),
-  RightOwner == z,
-  getFirst(T, W),
-  NewPvtSize is PvtSz + W,
-  NewPivot = [PivotAddr,NewPvtSz,z],
-  append(Left, [NewPivot], TempList),
-  append(TempList, T, NewMemList).
-fitRelease(Owner, List, NewMemList) :-
-  split3list(List, Owner, [H1|T1], [PivotAddr|[PvtSz|PvtOwner]], Right),
-  last(T1, LeftOwner),
-  LeftOwner == z,
-  getFirst(T1, W),
-  NewPvtSize is PvtSz + W,
-  NewPivot = [H1,PvtSz,z],
-  butlast([H1|T1], LeftButLast),
-  append(LeftButLast, [NewPvt], TempList),
-  append(TempList, Right, NewMemList).
-fitRelease(Owner, List, NewMemList) :-
-  split3list(List, Owner, [H1|T1], [PivotAddr|[PvtSz|PvtOwner]], [H2|T2]),
-  last(T2, RightOwner),
-  RightOwner == z,
-  last(T1, LeftOwner),
-  LeftOwner == z,
-  getFirst(T2, W2),
-  getFirst(T1, W1),
+  split3list(List, Owner, Left, [_|[PvtSz|_]], [H|T]),
+  last(H, z),
+  last(Left, LastLeft),
+  last(LastLeft, z),
+  getSecond(LastLeft, W1),
+  getFirst(LastLeft, NewAddr),
+  getSecond(H, W2),
   NewPvtSize is PvtSz + W1 + W2,
-  NewPivot = [H1,PvtSz,z],
-  butlast([H1|T1], LeftButLast),
-  append(LeftButLast, [NewPvt], TempList),
-  append(TempList, T2, NewMemList).
+  NewPivot = [NewAddr,NewPvtSize,z],
+  butlast(Left, LeftButLast),
+  append(LeftButLast, [NewPivot], TempList),
+  append(TempList, T, NewMemList), !.
+
 fitRelease(Owner, List, NewMemList) :-
-  split3list(List, Owner, [H1|T1], [PivotAddr|[PvtSz|PvtOwner]], [H2|T2]),
-  last(T2, RightOwner),
-  RightOwner \= z,
-  last(T1, LeftOwner),
-  LeftOwner \= z,
+  split3list(List, Owner, Left, [PivotAddr|PvtOther], [H|T]),
+  last(H, z),
+  getSecond(H, W),
+  getFirst(PvtOther, PvtSz),
+  NewPvtSize is PvtSz + W,
+  NewPivot = [PivotAddr,NewPvtSize,z],
+  append(Left, [NewPivot], TempList),
+  append(TempList, T, NewMemList), !.
+
+fitRelease(Owner, List, NewMemList) :-
+  split3list(List, Owner, Left, [_|[PvtSz|_]], Right),
+  last(Left, LastLeft),
+  last(LastLeft, z),
+  getSecond(LastLeft, W),
+  getFirst(LastLeft, NewAddr),
+  NewPvtSize is PvtSz + W,
+  NewPivot = [NewAddr,NewPvtSize,z],
+  butlast(Left, LeftButLast),
+  append(LeftButLast, [NewPivot], TempList),
+  append(TempList, Right, NewMemList), !.
+
+fitRelease(Owner, List, NewMemList) :-
+  split3list(List, Owner, Left, [PivotAddr|[PvtSz|_]], Right),
   NewPivot = [PivotAddr,PvtSz,z],
-  append([H1|T1], [NewPivot], TempList),
-  append(TempList, [H2|T2], NewMemList).
+  append(Left, [NewPivot], TempList),
+  append(TempList, Right, NewMemList).
