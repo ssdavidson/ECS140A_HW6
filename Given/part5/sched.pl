@@ -59,7 +59,7 @@ fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
   getSecond(H, ZSize),
   ZSize >= Size,
   NewZsize is ZSize - Size,
-  NewZsize = 0,
+  NewZsize == 0,
   getFirst(H, ZAddr),
   Addr = ZAddr,
   NewEntry = [Addr, Size, Owner],
