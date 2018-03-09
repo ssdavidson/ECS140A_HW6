@@ -29,9 +29,9 @@ naaa([H|T], NAL, AL) :- integer(H), naaa(T, NAL1, AL), append([H], NAL1, NAL).
 
 splitlist([P|T], [], P, T).
 splitlist([H|T], [H|T2], P, R) :- H \= P, splitlist(T, T2, P, R).
-split3list([P|T], C, [], P, T) :- member(C, P).
-split3list([H|T], C, [H|T2], P, R) :- last(H, LastObj), LastObj \= C, split3list(T, C, T2, P, R).
 
+split3list([P|T], C, [], P, T) :- last(P, LastObj), LastObj == C.
+split3list([H|T],C,[H|T2],P,R) :- split3list(T,C,T2,P,R).
 
 
 perm([ ],[ ]) :- !.
@@ -111,12 +111,12 @@ fitRelease(Owner, List, NewMemList) :-
   append(Left, [NewPivot], TempList),
   append(TempList, Right, NewMemList).
 
-
 fitanyRequest([Owner, Size], Memlist, NewMemList) :-
   split3list(Memlist, z, Left, [A,S,_], Right),
   S==Size,
   append(Left,[[A,Size,Owner]], TempList),
   append(TempList, Right, NewMemList).
+
 fitanyRequest([Owner, Size], Memlist, NewMemList) :-
   split3list(Memlist, z, Left, [A,S,_], Right),
   S>Size,
