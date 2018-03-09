@@ -38,8 +38,8 @@ perm([ ],[ ]) :- !.
 perm(L,[H|T]) :- select(H,L,Z), perm(Z,T).
 permsub(L, Z) :- naaa(L, NAL, _), perm(L, Z), naaa(Z, NAL, _).
 
-getFirst([H|T], Z) :- Z = H.
-getSecond([H|T], Z) :- getFirst(T, Z).
+getFirst([H|_], Z) :- Z = H.
+getSecond([_|T], Z) :- getFirst(T, Z).
 
 fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
   member(z, H),
@@ -67,3 +67,46 @@ fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
 fit1stRequest(Entry, [H|T], [H|T2]) :-
   last(H, LastObj), LastObj \= z,
   fit1stRequest(Entry, T, T2).
+
+
+fitRelease(Owner, List, NewMemList) :-
+  split3list(List, Owner, Left, [PivotAddr|[PvtSz|PvtOwner]], [H|T]),
+  last(T, RightOwner),
+  RightOwner == z,
+  getFirst(T, W),
+  NewPvtSize is PvtSz + W,
+  NewPivot = [PivotAddr,NewPvtSz,z],
+  append(Left, [NewPivot], TempList),
+  append(TempList, T, NewMemList).
+fitRelease(Owner, List, NewMemList) :-
+  split3list(List, Owner, [H1|T1], [PivotAddr|[PvtSz|PvtOwner]], Right),
+  last(T1, LeftOwner),
+  LeftOwner == z,
+  getFirst(T1, W),
+  NewPvtSize is PvtSz + W,
+  NewPivot = [H1,PvtSz,z],
+  butlast([H1|T1], LeftButLast),
+  append(LeftButLast, [NewPvt], TempList),
+  append(TempList, Right, NewMemList).
+fitRelease(Owner, List, NewMemList) :-
+  split3list(List, Owner, [H1|T1], [PivotAddr|[PvtSz|PvtOwner]], [H2|T2]),
+  last(T2, RightOwner),
+  RightOwner == z,
+  last(T1, LeftOwner),
+  LeftOwner == z,
+  getFirst(T2, W2),
+  getFirst(T1, W1),
+  NewPvtSize is PvtSz + W1 + W2,
+  NewPivot = [H1,PvtSz,z],
+  butlast([H1|T1], LeftButLast),
+  append(LeftButLast, [NewPvt], TempList),
+  append(TempList, T2, NewMemList).
+fitRelease(Owner, List, NewMemList) :-
+  split3list(List, Owner, [H1|T1], [PivotAddr|[PvtSz|PvtOwner]], [H2|T2]),
+  last(T2, RightOwner),
+  RightOwner \= z,
+  last(T1, LeftOwner),
+  LeftOwner \= z,
+  NewPivot = [PivotAddr,PvtSz,z],
+  append([H1|T1], [NewPivot], TempList),
+  append(TempList, [H2|T2], NewMemList).
