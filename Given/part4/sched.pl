@@ -37,3 +37,4 @@ split3list([H|T], C, [H|T2], P, R) :- last(H, LastObj), LastObj \= C, split3list
 perm([ ],[ ]) :- !.
 perm(L,[H|T]) :- select(H,L,Z), perm(Z,T).
 permsub(L, Z) :- naaa(L, NAL, _), perm(L, Z), naaa(Z, NAL, _).
+
