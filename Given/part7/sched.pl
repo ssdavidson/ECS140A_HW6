@@ -53,6 +53,20 @@ fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
   NewEntry = [Addr, Size, Owner],
   NewZEntry = [NewZAddr, NewZsize, z],
   append([NewEntry], [NewZEntry], TempList),
+  append(TempList, T, NewTempList),
+  merge2(NewTempList, NewMemList).
+fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
+  member(z, H),
+  getSecond(H, ZSize),
+  ZSize >= Size,
+  NewZsize is ZSize - Size,
+  NewZsize > 0,
+  getFirst(H, ZAddr),
+  NewZAddr is ZAddr + Size,
+  Addr = ZAddr,
+  NewEntry = [Addr, Size, Owner],
+  NewZEntry = [NewZAddr, NewZsize, z],
+  append([NewEntry], [NewZEntry], TempList),
   append(TempList, T, NewMemList).
 fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
   member(z, H),
@@ -67,6 +81,18 @@ fit1stRequest([Owner|[Size|_]], [H|T], NewMemList) :-
 fit1stRequest(Entry, [H|T], [H|T2]) :-
   last(H, LastObj), LastObj \= z,
   fit1stRequest(Entry, T, T2).
+
+merge2(List, R) :-
+  List = [H|T],
+  T = [H2|T2],
+  last(H, HLast),
+  last(H2, H2Last),
+  HLast == H2Last,
+  getFirst(H, NewAddr),
+  getSecond(H, HSize),
+  getSecond(H2, H2Size),
+  NewSize is HSize + H2Size,
+  append([[NewAddr, NewSize, HLast]], T2, R).
 
 
 fitRelease(Owner, List, NewMemList) :-
@@ -125,7 +151,7 @@ fitanyRequest([Owner, Size], Memlist, NewMemList) :-
   append(Left, [[A, Size, Owner]], TempList),
   append(TempList, [[NewAddr,Size2,z]], TempList2),
   append(TempList2, Right, NewMemList).
-  
+
 
 fit1st([], Memlist, Memlist).
 fit1st([H|T], Memlist, NewMemList) :-
@@ -141,7 +167,7 @@ fitany([], Memlist, Memlist).
 fitany([H|T], Memlist, NewMemList) :-
   \+is_list(H),
   fitRelease(H, Memlist, NewList),
-  fit1st(T, NewList, NewMemList).
+  fitany(T, NewList, NewMemList).
 fitany([H|T], Memlist, NewMemList) :-
   is_list(H),
   fitanyRequest(H, Memlist, NewList),
